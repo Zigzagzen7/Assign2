@@ -79,7 +79,7 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     self.dropout = nn.Dropout(1 - self.dp_keep_prob)
 
     #self.wx = nn.ModuleList([torch.empty(self.hidden_size, self.vocab_size)])
-    self.wx = nn.ModuleList([nn.Linear(self.emb_size, self.hidden_size, bias = True)])
+    self.wx = nn.ModuleList([nn.Linear(self.emb_size, self.hidden_size, bias = False)])
     #self.wx = nn.ModuleList([torch.tensor((self.vocab_size, self.hidden_size))])
     self.wx.extend([nn.Linear(self.hidden_size, self.hidden_size, bias = False) for _ in range(1, self.num_layers )])
     # LFPR: Est-ce qu'on doit utiliser torch.long() ?
@@ -91,7 +91,7 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     ###self.bh = clones(torch.empty(1, self.hidden_size), self.num_layers)
     #LFPR: Est-ce qu'on doit utiliser torch.long() ?
 
-    self.wy = nn.Linear(self.hidden_size, self.vocab_size, bias = True)
+    self.wy = nn.Linear(self.hidden_size, self.vocab_size, bias=True)
     #self.wy = nn.Linear(self.hidden_size, self.vocab_size)
     # LFPR: Est-ce qu'on doit utiliser torch.long() ?
 
@@ -116,9 +116,9 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     #self.wx = nn.init.uniform_(self.wx, a=-0.1, b=0.1)
 
     # LFPR : Est-ce qu'on doit initialiser le embedding ??
-    bound = 1 / (self.hidden_size) ** (0.5)
+    bound = (1 / (self.hidden_size)) ** (0.5)
 
-    nn.init.uniform_(self.embedding.weight, -0.1,0.1)
+    nn.init.uniform_(self.embedding.weight, -0.1, 0.1)
 
     for module in self.wx:
         nn.init.uniform_(module.weight, -bound, bound)
@@ -200,8 +200,6 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
       ##for pos in range(self.batch_size):
           ##one_hot_transf[pos, inputs[t,pos]] = 1.0
 
-
-
       l_hidden = []
       for layer in range(self.num_layers):
         #new_hidden = self.init_hidden()
@@ -222,13 +220,13 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
           #temp = temp + torch.mm(self.wx[layer], hidden[layer,:,:]) # Problem
           #temp = temp + torch.mm(hidden[layer-1, :, :], self.wx[layer])
           #temp2 = temp.add(self.wx[layer](hidden[layer-1, :, :]))
-          temp2 = temp.add(self.wx[layer](last_hidden_below))
+          temp2 = temp.add(self.wx[layer](self.dropout(last_hidden_below)))
 
         tan_h = torch.nn.Tanh()  # LFPR: tanh ou sigmoid ?
         temp2 = tan_h(temp2)
         l_hidden.append(temp2.clone())
 
-        temp2 = self.dropout(temp2)
+       # temp2 = self.dropout(temp2)
 
         #print("coucou")
         #print(temp)
@@ -250,10 +248,8 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
 
       #logits[t, :, :] = self.wy(hidden[self.num_layers - 1, :, :])
 
-
-
       #l_logits.append(self.wy(hidden[self.num_layers - 1]))
-      l_logits.append(self.wy(last_hidden_below.clone()))
+      l_logits.append(self.wy(self.dropout(last_hidden_below).clone()))
 
 
     logits= torch.stack(l_logits)
@@ -287,8 +283,8 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
                     shape: (generated_seq_len, batch_size)
     """
    
-    return samples
-
+    # return samples
+    pass
 
 # Problem 2
 class GRU(nn.Module): # Implement a stacked GRU RNN
@@ -300,14 +296,13 @@ class GRU(nn.Module): # Implement a stacked GRU RNN
     super(GRU, self).__init__()
 
     # TODO ========================
-
+    self.emb_size = emb_size
     self.hidden_size = hidden_size
     self.seq_len = seq_len
     self.batch_size = batch_size
     self.vocab_size = vocab_size
     self.num_layers = num_layers
     self.dp_keep_prob = dp_keep_prob
-
 
   def init_weights_uniform(self):
     pass
@@ -319,11 +314,13 @@ class GRU(nn.Module): # Implement a stacked GRU RNN
 
   def forward(self, inputs, hidden):
     # TODO ========================
-    return logits.view(self.seq_len, self.batch_size, self.vocab_size), hidden
+    # return logits.view(self.seq_len, self.batch_size, self.vocab_size), hidden
+    pass
 
   def generate(self, input, hidden, generated_seq_len):
     # TODO ========================
-    return samples
+    # return samples
+    pass
 
 
 # Problem 3
