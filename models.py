@@ -79,7 +79,7 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     self.dropout = nn.Dropout(1 - self.dp_keep_prob)
 
     #self.wx = nn.ModuleList([torch.empty(self.hidden_size, self.vocab_size)])
-    self.wx = nn.ModuleList([nn.Linear(self.emb_size, self.hidden_size, bias = False)])
+    self.wx = nn.ModuleList([nn.Linear(self.emb_size, self.hidden_size, bias=False)])
     #self.wx = nn.ModuleList([torch.tensor((self.vocab_size, self.hidden_size))])
     self.wx.extend([nn.Linear(self.hidden_size, self.hidden_size, bias = False) for _ in range(1, self.num_layers )])
     # LFPR: Est-ce qu'on doit utiliser torch.long() ?
@@ -119,6 +119,8 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     bound = (1 / (self.hidden_size)) ** (0.5)
 
     nn.init.uniform_(self.embedding.weight, -0.1, 0.1)
+    nn.init.uniform_(self.wy.weight, -0.1,  0.1)
+    nn.init.zeros_(self.wy.bias)
 
     for module in self.wx:
         nn.init.uniform_(module.weight, -bound, bound)
@@ -129,8 +131,7 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
         nn.init.uniform_(module.bias, -bound, bound)
 
     #self.wy = nn.init.uniform_(self.wy, a=-0.1, b=0.1)
-    nn.init.uniform_(self.wy.weight, -0.1,  0.1)
-    nn.init.zeros_(self.wy.bias)
+
 
     #self.bh = self.bh.fill_(0.0)
 
