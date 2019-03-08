@@ -123,7 +123,7 @@ class RNN(nn.Module): # Implement a stacked vanilla RNN with Tanh nonlinearities
     nn.init.uniform_(self.embedding.weight, -0.1, 0.1)
     nn.init.uniform_(self.wy.weight, -0.1,  0.1)
     #nn.init.uniform_(self.wy.bias, -0.1, 0.1)
-    # nn.init.zeros_(self.wy.bias)
+    nn.init.zeros_(self.wy.bias)
 
     for module in self.wx:
         nn.init.uniform_(module.weight, -bound, bound)
