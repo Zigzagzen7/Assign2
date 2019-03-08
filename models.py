@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 # except where indicated to implement the multi-head
 # attention. 
 
-print(f"Your version of Pytorch is {torch.__version__}")
+print(torch.__version__)
 
 
 def clones(module, N):
